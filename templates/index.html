@@ -1,0 +1,17 @@
+<html>
+  <head>
+	<title> NLP Project </title>
+	<script src="{{ url_for('static', filename='main.js') }}"></script>
+	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='stype.css') }}">
+  </head>
+
+  <body>
+	<center>
+	  <h1> App Entrypoint </h1>
+	  <h2>Available Models</h2>
+	  {% for model in models['models'] %}
+      <p>{{ model['model'] }} </p>
+	  {% endfor %}
+	</center>
+  </body>
+</html>
