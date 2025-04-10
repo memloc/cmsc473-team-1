@@ -15,20 +15,8 @@ ollama_model_names = [
 @app.route('/')
 def entry():
     # Just print the available models for now
-    models = available_models_string = ollama.list().dict()
-    return render_template("index.html", models=available_models_string)
-
-def pull_models():
-    # Pull the models from ollama
-    start_time = time.time()
-    for model in ollama_model_names:
-        elapsed = time.time() - start_time
-        print(f"({elapsed:.2}): Pulling model '{model}' from ollama")
-        ollama.pull(model)
-    return
-
+    models_available = ollama.list().dict()
+    return render_template("index.html", models=models_available)
 
 if __name__ == "__main__":
-    # Ensure all models are downloaded before starting the webserver
-    pull_models()
     app.run(host="127.0.0.1", port=8080, debug=True)
