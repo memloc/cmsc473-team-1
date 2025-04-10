@@ -54,4 +54,5 @@ async def main():
             )
 
 if __name__ == '__main__':
+    pull_models()
     asyncio.run(main())
