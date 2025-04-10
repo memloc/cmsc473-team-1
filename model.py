@@ -1,6 +1,7 @@
 import time
 import asyncio
 import logging
+import ollama
 from ollama import AsyncClient
 from datasets import load_dataset
 
