@@ -1,17 +1,29 @@
 <html>
+  <script>
+	const g_session_id = "{{session_id}}"
+  </script>
+  
   <head>
 	<title> NLP Project </title>
 	<script src="{{ url_for('static', filename='main.js') }}"></script>
-	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='stype.css') }}">
+	<link type="text/css" rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
-
+  
   <body>
 	<center>
 	  <h1> App Entrypoint </h1>
-	  <h2>Available Models</h2>
-	  {% for model in models['models'] %}
-      <p>{{ model['model'] }} </p>
-	  {% endfor %}
+	  <h3> <b> Session ID: </b> {{session_id}} </h3>
+	  <p> Check console log </p>
 	</center>
+	<p> Document </p>
+	<textarea id="document" name="text" style="resize:none" cols=40 rows=10> </textarea>
+	<p> Human Summary </p>
+	<textarea id="human_summary" name="text" style="resize:none" cols=40 rows=10> </textarea>
+	<p>
+	<button id="request_evaluate" onClick="send_request_evaluate()"> Req Eval </button>
+	<button id="request_results" onClick="send_request_status()"> Req Status </button>
+	<button id="request_status" onClick="send_request_results()"> Req Results </button>
+	</p>
+	<p> TODO: Show results </p>
   </body>
 </html>
