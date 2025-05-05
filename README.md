@@ -16,7 +16,7 @@ pip install -r requirements.txt
 
 To start the webserver on localhost:8080 run
 ```
-python server.py
+python run.py
 ```
 
 

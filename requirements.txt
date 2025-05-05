@@ -2,3 +2,4 @@ flask
 ollama
 datasets
 asyncio
+scikit-learn
