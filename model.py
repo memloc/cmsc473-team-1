@@ -8,7 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 # Load the document dataset
-ds = load_dataset("alexfabbri/multi_news")
+ds = load_dataset("alexfabbri/multi_news",trust_remote_code=True)
 # Set up ollama client and declare models
 ollama_cli = AsyncClient()
 ollama_model_names = [
@@ -51,10 +51,10 @@ async def query_all_models(models, prompt):
 # Run the task generate summaries, performs comparisons, calcs metrics and evaluation
 async def evaluate(document, human_summary):
     # Generate model summaries
-    outputs = await query_all_models(
-        ollama_model_names,
-        f"Summarize the following document in a single paragraph:\n{document}"
-    )
+    # outputs = await query_all_models(
+    #     ollama_model_names,
+    #     f"Summarize the following document in a single paragraph:\n{document}"
+    # )
     # Make all other models assess the quality of each other against the human summary
     # for model_idx in range(len(outputs)):
     #     current_model_name = outputs[model_idx].model
@@ -67,5 +67,9 @@ async def evaluate(document, human_summary):
     #         f"Compare {current_model_summary} and {summary}",
     #     )
     # Just consider the model summaries as results (for testing)
-    results = [x.message.content for x in outputs]
+    results = [{"label": "Granite", "value": 73},
+               {"label": "Dolphin", "value": 64},
+               {"label": "Llama", "value": 59},
+               {"label": "Deepseek", "value": 39}]
+
     return results
