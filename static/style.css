@@ -1,0 +1,77 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 80%;
+    margin: auto;
+    padding: 20px;
+    background-color: #ffffff;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.input-section {
+    margin-bottom: 20px;
+}
+
+.input-section label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.input-section textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    resize: vertical;
+}
+
+.buttons {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.buttons button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+.status {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.results {
+    text-align: center;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 800px; /* You can adjust this */
+  }
+  
+  textarea {
+    width: 100%;
+    resize: vertical; /* Allows vertical resizing only */
+    padding: 10px;
+    font-size: 1rem;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  #task_status {
+    font-weight: bold;
+    color: #555;
+  }
+  
