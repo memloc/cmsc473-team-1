@@ -4,6 +4,7 @@ import datetime
 import threading
 import asyncio
 import model
+import random
 
 from flask import Flask, render_template, request
 app = Flask(__name__)
@@ -58,11 +59,19 @@ def handle_req_results(session_id):
     task = tasks.pop(session_id)
     return { 'status': 'success', 'results': task.results }
 
+# Handle front-end request for a random document/summary pair from the dataset
+def handle_req_dataset_example():
+    idx_sample = random.randint(0, len(model.ds['train']))
+    doc = model.ds['train'][idx_sample]['document']
+    human_summary = model.ds['train'][idx_sample]['summary']
+    return {'status': 'success', 'example': { 'document': doc, 'human_summary': human_summary } }
+
 
 # Example of valid requests:
 # {'session_id': id, 'request': {'type': 'status'} }
 # {'session_id': id, 'request': {'type': 'evaluate', 'document': '', human_summary: ''}}
 # {'session_id': id, 'request': {'type': 'results'} }
+# {'session_id': id, 'request': {'type': 'dataset_example'} }
 @app.route('/request', methods=["POST", "GET"])
 def handle_requests():
     try:
@@ -84,6 +93,8 @@ def handle_requests():
                 raise e
         if req_type == "results":
             return handle_req_results(session_id)
+        if req_type == "dataset_example":
+            return handle_req_dataset_example()
     except Exception as e:
         return {'status': 'error', 'origin': 'handle_requests()' }
     

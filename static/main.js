@@ -29,6 +29,7 @@ async function send_request_evaluate() {
 		const statusElem = document.getElementById('task_status');
 		if (result.status) {
 			statusElem.textContent = result.status;
+			startPolling()
 		} else if (result.error) {
 			statusElem.textContent = "Error: " + result.error;
 		}
@@ -82,6 +83,31 @@ async function send_request_results() {
 
 		if (result.status === "success") {
 			show_chart(result.results);
+		} else {
+			alert("Error: " + result.error);
+		}
+	} catch (e) {
+		console.error("Exception during result request:", e);
+	}
+}
+
+async function send_request_dataset_example() {
+	try {
+		const response = await fetch('/request', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({
+				session_id: g_session_id,
+				request: { type: "dataset_example" }
+			})
+		});
+		const result = await response.json();
+		console.log("Results:", result);
+
+		// Go ahead and replace the two text boxes with the doc and summary
+		if (result.status === "success") {
+			document.getElementById('document').textContent = result.example.document;
+			document.getElementById('human_summary').textContent = result.example.human_summary;
 		} else {
 			alert("Error: " + result.error);
 		}
