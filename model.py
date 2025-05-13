@@ -47,6 +47,15 @@ async def query_all_models(models, prompt):
     results = await asyncio.gather(*tasks)
     return results
 
+# Removes <think>...</think>'s
+def remove_thougth(text):
+    try:
+        bf = text.split('<think>')[0]
+        af = text.split('</think>')[1]
+        return bf + af
+    except:
+        return text
+
 
 # Run the task generate summaries, performs comparisons, calcs metrics and evaluation
 async def evaluate(document, human_summary):
@@ -55,6 +64,12 @@ async def evaluate(document, human_summary):
     #     ollama_model_names,
     #     f"Summarize the following document in a single paragraph:\n{document}"
     # )
+
+    # NOTE: Uncomment this to remove "<think>"'s from deepseek 
+    # for idx in range(len(outputs)):
+    #     if outputs[idx].model == "deepseek-r1:8b":
+    #         outputs[idx].message.content = remove_thougth(outputs[idx].message.content)
+
     # Make all other models assess the quality of each other against the human summary
     # for model_idx in range(len(outputs)):
     #     current_model_name = outputs[model_idx].model
