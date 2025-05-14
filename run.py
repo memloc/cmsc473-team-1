@@ -1,53 +1,52 @@
-import sys
-import pathlib
+import time
 import datetime
-import subprocess
+import pathlib
+import argparse
+import threading
+import model
+import server
 
-usage="""
-python run.py {FLAGS}
-FLAGS:
-  -q             Run quiet. Spawned process will write to a log file rather than
-                 to stderr/stdout.
-"""
+def pull_models(ollama_model_names):
+    start_time = time.time()
+    for model_name in ollama_model_names:
+        elapsed = time.time() - start_time
+        print(f"({elapsed:.2}): Pulling model '{model_name}' from ollama")
+        model.ollama.pull(model_name)
 
 if __name__ == "__main__":
-    print(usage)
     shutdown = False
-    timestamp = datetime.datetime.now().strftime('%y%m%d%H%M%S')
-    logs_path = pathlib.Path("./logs/")
-    logs_path.mkdir(exist_ok=True)
-    log = pathlib.Path(f"./logs/{timestamp}.log")
 
-    # Launch server.py process, have it write stdout/stdder to a log file
-    if not "-q" in sys.argv:
-        proc_flask = subprocess.Popen(['python', 'server.py'],)
-    else:
-        proc_flask = subprocess.Popen(
-            ['python', 'server.py'],
-            stdout=open(log.absolute(), "w+"),
-            stderr=subprocess.STDOUT
-        )
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-m', '--models', help="Select the group of models (3b/3b or 8b) to use during runtime.", choices=["4b", "8b"], required=True, default="4b")
+    # parser.add_argument('-q', '--quiet', help="Run quiet and write to a log file rather than to stderr/stdout.")
 
-    if proc_flask.poll() != None:
-        print("Failed to start server.py")
-        shutdown=True
+    args = parser.parse_args()
 
-    if not shutdown:
-        print("Flask running on http://127.0.0.1:8080")
+    if args.models == "4b":
+        model.ollama_model_names = [
+            "qwen3:4b",   # 4b params, 40k context length
+            "phi3.5:3.8b",# 4b params, 131k context length
+            "cogito:3b",  # 3b params, 131k context length
+            "gemma3:4b",  # 4b params, 131k context length
+        ]
+        model.summarizer_models = model.ollama_model_names[0:3]
+        model.grader_model = model.ollama_model_names[-1]
 
-    # Run until either server.py or model.py terminates, or user wants terminate
-    while not shutdown:
-        cin = input("Terminate [y/n]: ")
-        if cin == "y":
-            shutdown=True
-        if proc_flask.poll() != None:
-            shutdown = True
         
-    if proc_flask.poll() == None:
-        proc_flask.terminate()
-        # Force kill if process wont end
-        if proc_flask.poll() != None:
-            proc_flask.kill()
+    elif args.models == "8b":
+        model.ollama_model_names = [
+            "dolphin3",             # 8b params, 128k context length
+            "deepseek-r1:8b",       # 8b params, 131k context length
+            "granite3.1-dense:8b"   # 8b params, 131k context length
+            "llama3.1:8b",          # 8b params, 131k context length
+        ]
+        model.summarizer_models= model.ollama_model_names[0:2]
+        model.grader_model = model.ollama_model_names[-1]
 
-    if log.exists():
-        print(f"Flask terminated see log for details: {log}")
+    pull_models(model.ollama_model_names)
+
+    print(f"summarizers: {model.summarizer_models}")
+    print(f"grader: {model.grader_model}")
+
+    # Launch flask, have it write stdout/stdder to a log file
+    server.main()

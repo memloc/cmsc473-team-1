@@ -142,7 +142,7 @@ def launch_async_task_service():
     loop.run_until_complete(task_service()) 
 
 
-if __name__ == "__main__":
+def main():
     # TODO: shutdown safely...
     task_service_thread = threading.Thread(target=launch_async_task_service)
     task_service_thread.start()

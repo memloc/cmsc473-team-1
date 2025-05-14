@@ -14,9 +14,14 @@ pip install -r requirements.txt
 ## Running
 *NOTE:* If the ollama models are not preinstalled this command will require additional initialization time in order to download the ollama models, before starting the webserver.
 
-To start the webserver on localhost:8080 run
+To start the webserver with the 4b models on localhost:8080 run the following command
 ```
-python run.py
+python run.py -m 4b
+```
+
+To start the webserver with the 8b models on localhost:8080 run the following command
+```
+python run.py -m 8b
 ```
 
 
