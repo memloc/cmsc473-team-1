@@ -160,5 +160,5 @@ function startPolling() {
 				send_request_results(); // Auto-fetch results
 			}
 		}
-	}, 500); // Poll every 3 seconds
+	}, 10000); // Poll every 5 seconds
 }

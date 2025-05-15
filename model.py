@@ -11,7 +11,7 @@ from typing import Dict
 
 ollama_cli = AsyncClient()
 global ollama_model_names
-grader_model = ""
+grader_models = []
 summarizer_models = []
 
 # Load the document dataset
@@ -69,20 +69,28 @@ async def query_all_models(models, prompt):
 
 
 
-async def grade(article: str, summaries: Dict[str, str]) -> Dict[str, str]:
+async def grade_summaries(grader_model, article: str, summaries: Dict[str, str]) -> Dict[str, float]:
     grades = {}
     for model, summary in summaries.items():
+        # Grader won't grade their own summaries
+        if model == grader_model:
+            continue
+
         grader_prompt = create_grader_prompt(article,summary)
         resp = await query_model(grader_model, prompt=grader_prompt)
-        print(resp.message.content)
+
+        # Remove the thought text from deepseek, and qwen when they grade
+        format_message = lambda model, message: \
+            message if model not in ["deepseek-r1:8b", "qwen3:4b"] \
+                else message.split('<think>')[0] + message.split('</think>')[1]
+        resp.message.content = format_message(grader_model, resp.message.content)
         m = re.search(r'([0-1]\.\d{1,2})', resp.message.content)
         score = m.group(1) if m else None
         text_sim = calculate_similarity(article, summary)
-        print(score)
-        print(text_sim)
         avg_score = (float(score) + text_sim) / 2 if score else None
         if avg_score is not None:
-            round_avg_score = round(avg_score, 2)
+            print(f"[Grader={grader_model}, Gradee={model}]: ({score} + {text_sim}) / 2 = {avg_score}")
+            round_avg_score = round(avg_score, 4)
             final = float(round_avg_score)
             grades[model] = final
         else:
@@ -99,7 +107,7 @@ async def evaluate(document, human_summary):
         create_summarizer_prompt(document)
     )
 
-    # Remove the thought text from deepseek
+    # Remove the thought text from deepseek, and qwen
     format_message = lambda model, message: \
         message if model not in ["deepseek-r1:8b", "qwen3:4b"] \
             else message.split('<think>')[0] + message.split('</think>')[1]
@@ -110,10 +118,22 @@ async def evaluate(document, human_summary):
 
     print(summaries)
 
-    grades = await grade(document, summaries)
+    print(grader_models)
+    print(summaries.keys())
+    # Get grade sum before averaging result in next loop
+    grades = dict.fromkeys(summaries.keys(),0.0)
+    print(grades.keys())
+    for grader_model in grader_models:
+        print(f"{grader_model} is now grading:")
+        grader_grades = await grade_summaries(grader_model, document, summaries)
+        for model_name in grader_grades.keys():
+            grades[model_name] += float(grader_grades[model_name])
 
     results = []
     for model in grades.keys():
+        # Average the score among the number of graders
+        grades[model] /= float(len(grader_models) if model not in grader_models
+                               else len(grader_models) - 1)
         x = {"label": model, "value": grades[model] }
         print(x)
         results.append(x)
