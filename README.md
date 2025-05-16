@@ -24,4 +24,10 @@ To start the webserver with the 8b models on localhost:8080 run the following co
 python run.py -m 8b
 ```
 
+For help, run 
+```
+python run.py -h 
+```
+
+A video of the full installation process can be seen [here](https://drive.google.com/file/d/17HEIthqF2pAYSxjOGg9t5WFw29sDYE6I/view?usp=sharing).
 
